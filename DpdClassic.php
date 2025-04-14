@@ -151,7 +151,7 @@ class DpdClassic extends AbstractDeliveryModuleWithState
             //If a min price for freeShipping is defined and the amount of cart reach this amount return 0
             //Be careful ! Thelia cartAmount is a decimal with 6 in precision ! That's why we must round cart amount
             if ($freeShippingAmount > 0 && $freeShippingAmount <= round($cartAmount, 2)) {
-                return null;
+                return $this->buildOrderPostage(0, $country, $locale, self::getConfigValue(self::DPD_CLASSIC_TAX_RULE_ID));
             }
 
             $prices = self::getPrices();
