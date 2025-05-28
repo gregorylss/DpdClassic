@@ -23,24 +23,22 @@
 
 namespace DpdClassic\Loop;
 
-use DpdClassic\DpdClassic;
-use Thelia\Core\Template\Element\ArraySearchLoopInterface;
+use DpdClassic\Model\DpdClassicPriceSlice;
 use Thelia\Core\Template\Element\BaseLoop;
 use Thelia\Core\Template\Element\LoopResult;
 use Thelia\Core\Template\Element\LoopResultRow;
+use Thelia\Core\Template\Element\PropelSearchLoopInterface;
 use Thelia\Core\Template\Loop\Argument\ArgumentCollection;
 use Thelia\Core\Template\Loop\Argument\Argument;
+use DpdClassic\Model\DpdClassicPriceSliceQuery;
 
 /**
  * Class DpdClassicPrice
  * @package DpdClassic\Loop
  * @author Thelia <info@thelia.net>
  */
-class DpdClassicPrice extends BaseLoop implements ArraySearchLoopInterface
+class DpdClassicPrice extends BaseLoop implements PropelSearchLoopInterface
 {
-    /* set countable to false since we need to preserve keys */
-    protected $countable = false;
-
     /**
      * @return ArgumentCollection
      */
@@ -51,30 +49,31 @@ class DpdClassicPrice extends BaseLoop implements ArraySearchLoopInterface
         );
     }
 
-    public function buildArray()
+    public function buildModelCriteria()
     {
-        $area = $this->getArea();
+        $areaId = $this->getArea();
 
-        $prices = DpdClassic::getPrices();
-
-        if (!isset($prices[$area]) || !isset($prices[$area]["slices"])) {
-            return array();
+        if (null === $areaId) {
+            return DpdClassicPriceSliceQuery::create();
         }
 
-        $areaPrices = $prices[$area]["slices"];
-        ksort($areaPrices);
-
-        return $areaPrices;
+        return DpdClassicPriceSliceQuery::create()
+            ->filterByAreaId($areaId)
+            ->orderByMaxWeight();
     }
 
     public function parseResults(LoopResult $loopResult)
     {
-        foreach ($loopResult->getResultDataCollection() as $maxWeight => $price) {
-            $loopResultRow = new LoopResultRow();
-            $loopResultRow->set("MAX_WEIGHT", $maxWeight)
-                ->set("PRICE", $price);
+        /** @var DpdClassicPriceSlice $slice */
+        foreach ($loopResult->getResultDataCollection() as $slice) {
+            $row = new LoopResultRow($this);
 
-            $loopResult->addRow($loopResultRow);
+            $row->set('ID', $slice->getId());
+            $row->set('AREA_ID', $slice->getAreaId());
+            $row->set('MAX_WEIGHT', $slice->getMaxWeight());
+            $row->set('PRICE', $slice->getPrice());
+
+            $loopResult->addRow($row);
         }
 
         return $loopResult;

@@ -25,6 +25,7 @@ namespace DpdClassic\Form;
 
 use DpdClassic\Controller\ExportExaprintController;
 use DpdClassic\DpdClassic;
+use DpdClassic\Model\DpdClassicSenderConfigQuery;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
@@ -47,11 +48,7 @@ class ExportExaprintForm extends BaseForm
 
     protected function buildForm()
     {
-        // Add value(s) if Config/sender.json exists
-
-        if (is_readable(ExportExaprintController::getJSONpath())) {
-            $values = json_decode(file_get_contents(ExportExaprintController::getJSONpath()), true);
-        }
+        $senderConfig = DpdClassicSenderConfigQuery::create()->findOne();
 
         $this->formBuilder
             ->add(
@@ -59,7 +56,7 @@ class ExportExaprintForm extends BaseForm
                 TextType::class,
                 array(
                     'label' => Translator::getInstance()->trans('Sender\'s name', [], DpdClassic::DOMAIN_NAME),
-                    'data' => (isset($values['name']) ? $values['name'] : ""),
+                    'data' => $senderConfig ? $senderConfig->getName() : '',
                     'constraints' => array(new NotBlank()),
                     'label_attr' => array(
                         'for' => 'name'
@@ -71,7 +68,7 @@ class ExportExaprintForm extends BaseForm
                 TextType::class,
                 array(
                     'label' => Translator::getInstance()->trans('Sender\'s address1', [], DpdClassic::DOMAIN_NAME),
-                    'data' => (isset($values['addr']) ? $values['addr'] : ""),
+                    'data' => $senderConfig ? $senderConfig->getPrimaryAdress() : '',
                     'constraints' => array(new NotBlank()),
                     'label_attr' => array(
                         'for' => 'addr'
@@ -83,7 +80,7 @@ class ExportExaprintForm extends BaseForm
                 TextType::class,
                 array(
                     'label' => Translator::getInstance()->trans('Sender\'s address2', [], DpdClassic::DOMAIN_NAME),
-                    'data' => (isset($values['addr2']) ? $values['addr2'] : ""),
+                    'data' =>  $senderConfig ? $senderConfig->getSecondaryAdress() : '',
                     'label_attr' => array(
                         'for' => 'addr2'
                     )
@@ -94,7 +91,7 @@ class ExportExaprintForm extends BaseForm
                 TextType::class,
                 array(
                     'label' => Translator::getInstance()->trans('Sender\'s zipcode', [], DpdClassic::DOMAIN_NAME),
-                    'data' => (isset($values['zipcode']) ? $values['zipcode'] : ""),
+                    'data' => $senderConfig ? $senderConfig->getZipcode() : '',
                     'constraints' => array(new NotBlank(), new Regex(['pattern' => "/^(2[A-B])|([0-9]{2})\d{3}$/"])),
                     'label_attr' => array(
                         'for' => 'zipcode'
@@ -106,7 +103,7 @@ class ExportExaprintForm extends BaseForm
                 TextType::class,
                 array(
                     'label' => Translator::getInstance()->trans('Sender\'s city', [], DpdClassic::DOMAIN_NAME),
-                    'data' => (isset($values['city']) ? $values['city'] : ""),
+                    'data' => $senderConfig ? $senderConfig->getCity() : '',
                     'constraints' => array(new NotBlank()),
                     'label_attr' => array(
                         'for' => 'city'
@@ -118,7 +115,7 @@ class ExportExaprintForm extends BaseForm
                 TextType::class,
                 array(
                     'label' => Translator::getInstance()->trans('Sender\'s phone', [], DpdClassic::DOMAIN_NAME),
-                    'data' => (isset($values['tel']) ? $values['tel'] : ""),
+                    'data' => $senderConfig ? $senderConfig->getPhone() : '',
                     'constraints' => array(new NotBlank(), new Regex(['pattern' => "/^0[1-9]\d{8}$/"])),
                     'label_attr' => array(
                         'for' => 'tel'
@@ -130,7 +127,7 @@ class ExportExaprintForm extends BaseForm
                 TextType::class,
                 array(
                     'label' => Translator::getInstance()->trans('Sender\'s mobile phone', [], DpdClassic::DOMAIN_NAME),
-                    'data' => (isset($values['mobile']) ? $values['mobile'] : ""),
+                    'data' => $senderConfig ? $senderConfig->getMobilePhone() : '',
                     'constraints' => array(new NotBlank(), new Regex(['pattern' => "#^0[6-7]{1}\d{8}$#"])),
                     'label_attr' => array(
                         'for' => 'mobile'
@@ -142,7 +139,7 @@ class ExportExaprintForm extends BaseForm
                 EmailType::class,
                 array(
                     'label' => Translator::getInstance()->trans('Sender\'s email', [], DpdClassic::DOMAIN_NAME),
-                    'data' => (isset($values['mail']) ? $values['mail'] : ""),
+                    'data' => $senderConfig ? $senderConfig->getEmail() : '',
                     'constraints' => array(new NotBlank()),
                     'label_attr' => array(
                         'for' => 'mail'
@@ -155,7 +152,7 @@ class ExportExaprintForm extends BaseForm
                 array(
                     'label' => Translator::getInstance()->trans('DpdClassic Sender\'s code', [], DpdClassic::DOMAIN_NAME),
                     'constraints' => array(new NotBlank(), new Regex(['pattern' => "#^\d{8}$#"])),
-                    'data' => (isset($values['expcode']) ? $values['expcode'] : ""),
+                    'data' => $senderConfig ? $senderConfig->getDpdCode() : '',
                     'label_attr' => array(
                         'for' => 'expcode'
                     )

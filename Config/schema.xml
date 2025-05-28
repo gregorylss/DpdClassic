@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<database defaultIdMethod="native" name="TheliaMain"  namespace="DpdClassic\Model"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:noNamespaceSchemaLocation="../../../vendor/propel/propel/resources/xsd/database.xsd" >
+
+  <table name="dpd_classic_price_slice">
+    <column name="id" type="INTEGER" required="true" primaryKey="true" autoIncrement="true"/>
+    <column name="area_id" required="true" type="INTEGER" />
+    <column name="max_weight" type="FLOAT" required="true"/>
+    <column name="price" type="FLOAT" required="true"/>
+    <behavior name="timestampable" />
+    <foreign-key foreignTable="area" name="fk_dpd_classic_price_slice_area_id" onDelete="RESTRICT" onUpdate="RESTRICT">
+      <reference foreign="id" local="area_id" />
+    </foreign-key>
+  </table>
+
+  <table name="dpd_classic_sender_config">
+    <column name="id" type="INTEGER" required="true" primaryKey="true" autoIncrement="true"/>
+    <column name="name" type="VARCHAR" size="255" required="true"/>
+    <column name="primary_adress" type="VARCHAR" size="255" required="true"/>
+    <column name="secondary_adress" type="VARCHAR" size="255"/>
+    <column name="zip_code" type="VARCHAR" size="10" required="true"/>
+    <column name="city" type="VARCHAR" size="100" required="true"/>
+    <column name="phone" type="VARCHAR" size="20" required="true"/>
+    <column name="mobile_phone" type="VARCHAR" size="20"/>
+    <column name="email" type="VARCHAR" size="255" required="true"/>
+    <column name="dpd_code" type="VARCHAR" size="20" required="true"/>
+    <behavior name="timestampable" />
+  </table>
+</database>
